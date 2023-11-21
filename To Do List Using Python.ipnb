@@ -1,13 +1,11 @@
 import hashlib
 import json
-import pandas as pd
 import tkinter as tk
 from tkinter import ttk
 from tkinter import simpledialog
-from tkinter import messagebox
 
 class UserAuthentication:
-    def __init__(self, filename='user_data.txt'):
+    def __init__(self, filename='users_data.txt'):
         self.filename = filename
         self.load_user_data()
         self.current_user = None
@@ -16,13 +14,20 @@ class UserAuthentication:
     def load_user_data(self):
         try:
             with open(self.filename, 'r') as file:
-                self.user_data = json.load(file)
+                data = file.read()
+                print(f"Loaded data from file: {data}")
+                self.user_data = json.loads(data) if data else {}
         except FileNotFoundError:
+            print(f"File not found: {self.filename}")
+            self.user_data = {}
+        except json.JSONDecodeError as e:
+            print(f"Error decoding JSON: {e}")
             self.user_data = {}
 
     def save_user_data(self):
         with open(self.filename, 'w') as file:
             json.dump(self.user_data, file)
+            print(f"Saved data to file: {self.user_data}")
 
     def register_user(self, username, password):
         if username not in self.user_data:
@@ -49,6 +54,12 @@ class UserAuthentication:
             self.save_user_data()
             print('To-do list saved.')
 
+    def load_todo_list(self):
+        if self.current_user and self.current_user in self.user_data:
+            todo_list_data = self.user_data[self.current_user]['todo_list']
+            self.current_todo_list = TodoList(todo_list_data)
+            print('To-do list loaded.')
+
 class TodoList:
     def __init__(self, tasks=None):
         self.tasks = tasks if tasks is not None else []
@@ -57,7 +68,6 @@ class TodoList:
         task = {'title': title, 'description': description, 'status': 'incomplete'}
         self.tasks.append(task)
         print(f'Task "{title}" added.')
-
 
     def view_tasks(self, frame):
         for widget in frame.winfo_children():
@@ -81,7 +91,6 @@ class TodoList:
 
                 delete_button = ttk.Button(frame, text='Delete', command=lambda index=i: self.remove_task(index))
                 delete_button.grid(row=i, column=2, padx=5)
-
 
     def remove_task(self, task_index):
         if 1 <= task_index <= len(self.tasks):
@@ -183,6 +192,7 @@ class TodoListApp:
 
     def refresh_todo_list(self):
         if self.auth_system.current_user:
+            self.auth_system.load_todo_list()
             self.update_todo_list_frame()
 
     def login(self):
@@ -190,6 +200,7 @@ class TodoListApp:
         password = self.entry_password.get()
 
         if self.auth_system.authenticate_user(username, password):
+            self.auth_system.load_todo_list()
             self.update_todo_list_frame()
             self.notebook.select(self.todo_frame)
 
