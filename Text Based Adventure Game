@@ -1,0 +1,580 @@
+import time
+import random
+
+def print_slow(message):
+    for char in message:
+        print(char, end='', flush=True)
+        time.sleep(0.05)
+    print()
+##game-2 code starts
+
+def guess_the_number_game():
+    print("Welcome to the Guess the Number Game!")
+    wins = 0
+
+    for play in range(1, 7):
+        print(f"\nPlay {play}:")
+        target_number = random.randint(0, 9)
+        attempts = 0
+        correct_guess = False
+
+        while attempts < 3:
+            guess = int(input("Guess the number (0-9): "))
+
+            if guess == target_number:
+                print("Congratulations! You guessed the number.")
+                correct_guess = True
+                break
+            elif guess > target_number:
+                print("Too Large. Try a smaller number.")
+            else:
+                print("Too Small. Try a larger number.")
+
+            attempts += 1
+
+        if not correct_guess:
+            print(f"Sorry, you couldn't guess the number. The correct number was {target_number}.")
+        else:
+            wins += 1
+
+    print("\nGame Over!")
+    print(f"You won {wins} out of 6 plays.")
+    return wins
+
+##game-2 code ends
+##game-1 code starts
+
+def door_1():
+    flag=1
+    print_slow("You have choosen an adventurous path you will enjoy going along this path!")
+    time.sleep(1)
+    print_slow("As you are kidnaped, few days ago you don't have energy to continue your journey so...")
+    # Game 1: Collecting Food and Gaining Health
+    health = 0
+    print_slow("You stumble upon a mysterious game to collect food and regain your strength.")
+    time.sleep(1)
+    #game-1
+    
+    health = game_collect_food(size=10, food_to_collect=20, max_moves=50)
+    health*=5
+    time.sleep(1)
+
+    # Check if health is sufficient to proceed
+    if health < 70:
+        print_slow(f"You gained {health}% health.")
+        print("You Died in the Den...")
+        flag=0
+    else:
+        print_slow(f"Congratulations! You gained {health}% health.")
+        print_slow("Feeling invigorated, you move forward to face the enemies.")
+
+    # Game 2: Number Guessing Game for Weapons
+    
+    if flag==1:
+        print_slow("Now, you encounter a mysterious game to obtain weapons.")
+        time.sleep(1)
+        weapons =guess_the_number_game()# Assume the player always wins the game
+        print_slow(f"Congratulations! You obtained {weapons} weapons.")
+        time.sleep(1)
+
+        # Fight with enemies
+        print_slow("You are now armed and ready to face the enemies.")
+        enemies_to_kill = 5
+        for _ in range(weapons):
+            print_slow("You skillfully defeat an enemy!")
+        if weapons<enemies_to_kill:
+            print(f"You killed {weapons} enemies.. ")
+            print(f"still {enemies_to_kill-weapons} are remaining and you are killed in the den..")
+            print("You lost the game.")
+        else:
+            print_slow("Congratulations! You vanquished all foes and escaped from the den.")
+            print_slow("You are FREE!")
+    elif flag==0:
+        print("You lost the game.")
+
+def initialize_grid(size, food_count):
+    # Create a grid with a random arrangement of food (F), obstacles (O), and an empty space (E)
+    grid = [['E' for _ in range(size)] for _ in range(size)]
+    
+    # Place obstacles in random locations
+    for _ in range(size // 2):
+        row, col = random.randint(0, size-1), random.randint(0, size-1)
+        grid[row][col] = 'O'  # Obstacle
+    
+    # Place food in random locations
+    placed_food = 0
+    while placed_food < food_count:
+        row, col = random.randint(0, size-1), random.randint(0, size-1)
+        if grid[row][col] == 'E':
+            grid[row][col] = 'F'  # Food
+            placed_food += 1
+    
+    return grid
+
+def print_grid1(grid, player_position):
+    # Display the grid with the player's current position marked as "P"
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            if (i, j) == player_position:
+                print("P", end=" ")
+            else:
+                print(grid[i][j], end=" ")
+        print()
+
+def is_valid_move1(position, direction, size, grid):
+    # Check if the move is valid within the grid boundaries and not blocked by an obstacle
+    row, col = position
+    if direction == 'up':
+        return row - 1 >= 0 and grid[row - 1][col] != 'O'
+    elif direction == 'down':
+        return row + 1 < size and grid[row + 1][col] != 'O'
+    elif direction == 'left':
+        return col - 1 >= 0 and grid[row][col - 1] != 'O'
+    elif direction == 'right':
+        return col + 1 < size and grid[row][col + 1] != 'O'
+    return False
+
+def make_move1(position, direction):
+    # Update the player's position based on the chosen direction
+    row, col = position
+    if direction == 'up':
+        return (row - 1, col)
+    elif direction == 'down':
+        return (row + 1, col)
+    elif direction == 'left':
+        return (row, col - 1)
+    elif direction == 'right':
+        return (row, col + 1)
+
+def game_collect_food(size, food_to_collect, max_moves):
+    # Game to collect food
+    
+    # Initialize the grid and set the starting position
+    grid = initialize_grid(size, food_to_collect)
+    player_position = (0, 0)
+    collected_food = 0
+    total_health = 100
+    moves = 0
+    
+    # Display the initial grid
+    print_grid1(grid, player_position)
+    
+    # Game loop
+    while collected_food < food_to_collect and moves < max_moves and total_health > 0:
+        # Get the player's decision
+        decision = input("Enter your move (up/down/left/right/quit): ").lower()
+        
+        if decision == 'quit':
+            print(f"Number of foods collected: {collected_food}")
+            return collected_food
+        
+        # Check if the move is valid
+        if is_valid_move1(player_position, decision, size, grid):
+            # Make the move
+            new_position = make_move1(player_position, decision)
+            
+            # Check the content of the new position
+            if grid[new_position[0]][new_position[1]] == 'F':
+                # If food is not already collected, collect it
+                if grid[new_position[0]][new_position[1]] != 'C':
+                    collected_food += 1
+                    total_health += 5
+                    print(f"You collected food! Total food collected: {collected_food}")
+                    # Mark the collected food to avoid collecting it again
+                    grid[new_position[0]][new_position[1]] = 'C'
+                else:
+                    print("You already collected this food. Choose another direction.")
+            elif grid[new_position[0]][new_position[1]] == 'O':
+                print("Oops! You hit an obstacle. Health reduced by 5%.")
+                total_health -= 5
+                if total_health <= 0:
+                    print("Your health is too low. Game over!")
+                    break
+            else:
+                total_health += 1  # Increase health for moving to an empty space
+            
+            # Update the player's position
+            player_position = new_position
+            
+            # Display the updated grid
+            print_grid1(grid, player_position)
+            # print(f"Current Health: {total_health}%")
+            print(f"Number of foods collected: {collected_food}")
+
+            # Increment the moves
+            moves += 1
+        else:
+            print("Invalid move! Try again.")
+    
+    # Check if the player collected the required amount of food
+    if collected_food == food_to_collect:
+        print(f"Congratulations! You collected all the food with a total health of {total_health}%.")
+    
+    
+    # Check if the maximum moves are reached
+    if moves == max_moves:
+        print(f"Maximum moves reached. Number of foods collected: {collected_food}")
+    
+    # Check if not enough health is left
+    if total_health <= 0:
+        print("You lost. Not enough health left.")
+    
+    return collected_food
+##game-1 code ends
+
+def door_2():
+    print_slow("You open Door-2 and discover a note: 'Only the intelligent shall escape with ease.'")
+
+    # Game 3: Decoding the Message for a Secret Mobile
+    print_slow("A mysterious decoding game appears, promising a secret mobile if solved.")
+    time.sleep(1)
+    # Implement the game logic here...
+    final_health,fl = game_2(player_health=100)
+    if fl==1:
+        print(f"Player's Final Health: {final_health}")
+        # For simplicity, let's assume the player always decodes the message.
+        print_slow("Congratulations! You deciphered the message and found a secret mobile.")
+        time.sleep(1)
+
+        # Call for help
+        print_slow("Using the mobile, you make a crucial call for assistance.")
+        help_number = input("Enter the 5-digit phone number to call for help: ")
+        # Implement the game logic here...
+        # For simplicity, let's assume the player always dials the correct number.
+        print_slow("A mysterious ally arrives to aid you.")
+
+        # Game 4: AP/GP Series Number Finding Game
+        print_slow("You and your ally embark on an adventure, navigating through an AP/GP series challenge.")
+        time.sleep(1)
+        player_score=0
+        for _ in range(8):
+            player_score += game_3(player_score)
+            print(f"Player's Score: {player_score}")
+
+        # For simplicity, let's assume the player always guesses the correct series.
+        if (player_score//5)>5:
+            res=5
+        else:res=(player_score//5)
+        for _ in range(res):
+            print_slow("You successfully cracked the series! Another enemy falls.")
+            time.sleep(1)
+        if res<5:
+            print(f"You killed {res} enemies.. ")
+            print(f"still {5-res} are remaining and you are killed in the den..")
+            print("You lost the game.")
+        else:
+            print_slow("Congratulations! With your ally, you escaped the den.")
+            print_slow("You are VICTORIOUS!")
+    elif fl==0:
+        print("You lost the game.")
+        print("You Died.")
+
+##game-3 code starts
+
+
+def generate_encoded_text():
+    # Generate a random string of uppercase letters (A-Z)
+    encoded_text = ''.join(random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ') for _ in range(8))
+    return encoded_text
+
+def encode_text(text, key):
+    # Encode the text using a simple Caesar cipher with the given key
+    encoded_text = ''
+    for char in text:
+        if char.isalpha():
+            # Shift the letter by the key value
+            encoded_char = chr((ord(char) - ord('A') + key) % 26 + ord('A'))
+            encoded_text += encoded_char
+        else:
+            # Keep non-alphabetic characters unchanged
+            encoded_text += char
+    return encoded_text
+
+def decode_text(text, key):
+    # Decode the text using a simple Caesar cipher with the given key
+    decoded_text = ''
+    for char in text:
+        if char.isalpha():
+            # Shift the letter back by the key value
+            decoded_char = chr((ord(char) - ord('A') + key) % 26 + ord('A'))
+            decoded_text += decoded_char
+        else:
+            # Keep non-alphabetic characters unchanged
+            decoded_text += char
+    return decoded_text
+
+def game_2(player_health=100):
+    # This is the encoding game
+    while player_health >= 90:
+        # Generate random text and key for the player to decode
+        encoded_text = generate_encoded_text()
+        key = random.randint(1, 10)
+        
+        # Encode the text using the key
+        encoded_text_with_key = encode_text(encoded_text, key)
+        
+        # Display the encoded text and key to the player
+        print(f"Encoded Text: {encoded_text_with_key}")
+        print(f"Key: {key}")
+        
+        # Player's decoding attempt
+        player_guess = input("Enter your decoding guess: ").upper()
+
+        # Check if the player's guess is correct
+        if player_guess.upper() == decode_text(encoded_text_with_key, key):
+            print("Congratulations! You decoded the text correctly.")
+            print("You Win!")
+            fl=1
+            # Return the remaining health
+            return player_health,fl
+        else:
+            print(f"Oops! Your decoding attempt was incorrect. The correct answer is: {decode_text(encoded_text_with_key, key)}")
+            # Update player's health for an incorrect guess
+            player_health -= max(5, int(0.05 * player_health))
+            print(f"Your health is now {player_health}%.\n")
+            fl=0
+
+    # If health is less than 90%, end the game
+    print("Sorry, your health is too low. You Lost!")
+    return player_health,fl
+
+# # Example usage:
+# player_health = 100
+
+# final_health = game_2(player_health)
+# print(f"Player's Final Health: {final_health}")
+
+
+##game-3 code ends
+##game-4 code starts
+
+def generate_sequence(length, start, common_ratio, is_ap):
+    # Generate a sequence of numbers with either an AP or GP pattern
+    sequence = [start]
+    for _ in range(length - 1):
+        if is_ap:
+            start += common_ratio
+        else:
+            start *= common_ratio
+        sequence.append(start)
+    return sequence
+
+def generate_next_number(sequence, is_ap):
+    # Generate the next number in the sequence based on either an AP or GP pattern
+    if is_ap:
+        return sequence[-1] + (sequence[1] - sequence[0])
+    else:
+        return sequence[-1] * (sequence[1] / sequence[0])
+
+def game_3(player_score=0):
+    # This is the find the next sequence game
+    
+    # Set the parameters for the sequence
+    start_number = random.randint(1, 5)
+    common_difference_or_ratio = random.randint(2, 5)
+    is_ap = random.choice([True, False])
+    sequence_length = 5
+    
+    # Generate a sequence for the player to analyze
+    sequence = generate_sequence(sequence_length, start_number, common_difference_or_ratio, is_ap)
+    
+    # Display the sequence and whether it's an AP or GP to the player
+    # pattern_type = "AP" if is_ap else "GP"
+    print(f"Sequence: {sequence} ")
+    
+    # Generate the next number based on either an AP or GP pattern
+    next_number = generate_next_number(sequence, is_ap)
+    
+    # Player's guess for the next number in the sequence
+    player_guess = float(input("Enter your guess for the next number in the sequence: "))
+    
+    # Check if the player's guess is correct
+    if round(player_guess, 2) == round(next_number, 2):
+        print(f"Congratulations! {next_number} is the correct next number.")
+        # Increase player's score for a correct guess
+        player_score += 10
+    else:
+        print(f"Oops! {player_guess} is incorrect. The correct next number is {next_number}.")
+        # Decrease player's score for an incorrect guess
+        player_score -= 5
+    
+    # Return the updated player's score
+    return player_score
+
+# Example usage:
+# player_score = 10  # Initial score
+
+# Play the game for five attempts
+
+##game-4 code ends
+
+##game-5 code starts
+
+
+def generate_valid_grid():
+    # Generate a 9x9 grid with a valid path from source to destination
+    while True:
+        grid = [[random.choice([0, 1]) for _ in range(9)] for _ in range(9)]
+        grid[0][0] = 0  # Ensure the source is a path
+        grid[8][8] = 0  # Ensure the destination is a path
+
+        # Check if there is a valid path from source to destination
+        if is_valid_path(grid):
+            return grid
+
+def is_valid_path(grid):
+    # Check if there is a valid path from source to destination
+    visited = set()
+
+    def dfs(row, col):
+        if not (0 <= row < 9 and 0 <= col < 9) or grid[row][col] == 1 or (row, col) in visited:
+            return False
+        visited.add((row, col))
+
+        if (row, col) == (8, 8):
+            return True
+
+        # Explore neighbors
+        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+        for dr, dc in directions:
+            if dfs(row + dr, col + dc):
+                return True
+
+        return False
+
+    return dfs(0, 0)
+
+def print_grid(grid, current_position):
+    # Display the grid with the player's current position marked as "X"
+    for i in range(9):
+        for j in range(9):
+            if (i, j) == current_position:
+                print("X", end=" ")
+            elif grid[i][j] == 0:
+                print("0", end=" ")
+            else:
+                print("1", end=" ")
+        print()
+
+def is_valid_move(position, direction, grid):
+    # Check if the move is valid within the grid boundaries and not a wall
+    row, col = position
+    if direction == 'up':
+        return row - 1 >= 0 and grid[row - 1][col] == 0
+    elif direction == 'down':
+        return row + 1 < 9 and grid[row + 1][col] == 0
+    elif direction == 'left':
+        return col - 1 >= 0 and grid[row][col - 1] == 0
+    elif direction == 'right':
+        return col + 1 < 9 and grid[row][col + 1] == 0
+
+def make_move(position, direction, grid):
+    # Update the player's position based on the chosen direction
+    if is_valid_move(position, direction, grid):
+        row, col = position
+        if direction == 'up':
+            return (row - 1, col)
+        elif direction == 'down':
+            return (row + 1, col)
+        elif direction == 'left':
+            return (row, col - 1)
+        elif direction == 'right':
+            return (row, col + 1)
+    else:
+        return position  # If the move is not valid, stay in the current position
+
+def game_5():
+    # Fixed grid game with a limit of 3 mistakes
+    
+    # Initialize the grid and set the starting position
+    grid = generate_valid_grid()
+    current_position = (0, 0)
+    
+    # Display the initial grid
+    print_grid(grid, current_position)
+    
+    # Game loop
+    mistakes = 0
+    while current_position != (8, 8):
+        # Get the player's decision
+        decision = input("Enter your move (up/down/left/right): ").lower()
+        
+        # Make the move
+        new_position = make_move(current_position, decision, grid)
+        
+        # If the move is not valid, count as a mistake
+        if new_position == current_position:
+            print("Invalid move! Try again.")
+            mistakes += 1
+            
+            # If three mistakes are made, end the game
+            if mistakes == 3:
+                print("You made three mistakes. Game over!")
+                break
+        else:
+            # Update the player's position
+            current_position = new_position
+            
+            # Display the updated grid
+            print_grid(grid, current_position)
+    
+    # Check if the player reached the destination
+    if current_position == (8, 8):
+        print("Congratulations! You reached the destination.")
+        return True
+    return False
+
+# Run the game
+#game_5()
+
+
+##game-5 code ends
+
+def door_3():
+    print_slow("You open Door-3 and are greeted by a message: 'The most exciting route awaits you.'")
+
+    # Game 5: Description Game and Path Finding
+    print_slow("A thrilling path lies ahead as you and your chosen superhero navigate a description game and a path-finding challenge.")
+    time.sleep(1)
+    print("Select a superhero:")
+    superheroes = ["Superman", "Batman", "Spider-Man"]
+    for i, hero in enumerate(superheroes, start=1):
+        print(f"{i}. {hero}")
+    try:
+        choice = int(input("Enter the number of your chosen superhero: "))
+        if 1 <= choice <= len(superheroes):
+            print("You selected :",superheroes[choice - 1])
+        else:
+            print("Invalid choice. Please enter a valid number.")
+    except ValueError:
+        print("Invalid input. Please enter a number.")
+    a=game_5()
+    if a:
+        print_slow(f"You won the game with the help of your favourite superhero {superheroes[choice - 1]}")
+    # For simplicity, let's assume the player always wins the game.
+    else:
+        print_slow("Better luck next time...")
+    print_slow("Congratulations! You and your superhero companion successfully escaped.")
+    time.sleep(1)
+    print_slow("Together, you emerge from the den into the light of freedom.")
+    print_slow("You are TRIUMPHANT!")
+
+
+def main():
+    print_slow("You awaken in darkness, realizing you've been kidnapped.")
+    print_slow("Before you stand three ominous doors: Door-1, Door-2, and Door-3.")
+    time.sleep(1)
+
+    choice = input("Choose a door (1/2/3): ")
+    if choice == '1':
+        door_1()
+    elif choice == '2':
+        door_2()   
+    elif choice == '3':
+        door_3()
+    else:
+        print_slow("Invalid choice. The game ends.")
+
+if __name__ == "__main__":
+    main()
+
