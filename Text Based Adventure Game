@@ -54,8 +54,20 @@ def door_1():
     print_slow("You stumble upon a mysterious game to collect food and regain your strength.")
     time.sleep(1)
     #game-1
+    print("Instructions:  ")
+    print("1. You find yourself in a mysterious place, low on energy.")
+    print("2. Encounter a game to collect food and regain strength.")
+    print("3. 'P' is your position, 'F' is food, 'O' is an obstacle on the grid.")
+    print("4. Goal: Collect enough food to increase health.")
+    print("5. Use 'up', 'down', 'left', 'right' to move.")
+    print("6. Avoid 'O' obstacles, as they decrease health.")
+    print("7. Collect 'F' food to increase health.")
+    print("8. Limited moves to collect required food.")
+    print("9. to continue further you must score at least 70% health(min 14 foods)")
+    print("10. You can quit the game annytime.")
+    print()
     
-    health = game_collect_food(size=10, food_to_collect=20, max_moves=50)
+    health = game_collect_food_g1(size=10, food_to_collect=20, max_moves=50)
     health*=5
     time.sleep(1)
 
@@ -72,6 +84,15 @@ def door_1():
     
     if flag==1:
         print_slow("Now, you encounter a mysterious game to obtain weapons.")
+        print("Instructions:  ")
+        print("1. Enter a room to guess a number between 0 and 9.")
+        print("2. Limited attempts to guess the correct number.")
+        print("3. Hints given if the target number is higher or lower.")
+        print("4. Correct guess: Win the round and gain weapons.")
+        print("5. Repeat for a total of 6 rounds.")
+        print("6. More wins, more weapons accumulated.")
+        print()
+
         time.sleep(1)
         weapons =guess_the_number_game()# Assume the player always wins the game
         print_slow(f"Congratulations! You obtained {weapons} weapons.")
@@ -92,7 +113,7 @@ def door_1():
     elif flag==0:
         print("You lost the game.")
 
-def initialize_grid(size, food_count):
+def initialize_grid_g1(size, food_count):
     # Create a grid with a random arrangement of food (F), obstacles (O), and an empty space (E)
     grid = [['E' for _ in range(size)] for _ in range(size)]
     
@@ -111,7 +132,7 @@ def initialize_grid(size, food_count):
     
     return grid
 
-def print_grid1(grid, player_position):
+def print_grid_g1(grid, player_position):
     # Display the grid with the player's current position marked as "P"
     for i in range(len(grid)):
         for j in range(len(grid[0])):
@@ -121,7 +142,7 @@ def print_grid1(grid, player_position):
                 print(grid[i][j], end=" ")
         print()
 
-def is_valid_move1(position, direction, size, grid):
+def is_valid_move_g1(position, direction, size, grid):
     # Check if the move is valid within the grid boundaries and not blocked by an obstacle
     row, col = position
     if direction == 'up':
@@ -134,7 +155,7 @@ def is_valid_move1(position, direction, size, grid):
         return col + 1 < size and grid[row][col + 1] != 'O'
     return False
 
-def make_move1(position, direction):
+def make_move_g1(position, direction):
     # Update the player's position based on the chosen direction
     row, col = position
     if direction == 'up':
@@ -146,18 +167,18 @@ def make_move1(position, direction):
     elif direction == 'right':
         return (row, col + 1)
 
-def game_collect_food(size, food_to_collect, max_moves):
+def game_collect_food_g1(size, food_to_collect, max_moves):
     # Game to collect food
     
     # Initialize the grid and set the starting position
-    grid = initialize_grid(size, food_to_collect)
+    grid = initialize_grid_g1(size, food_to_collect)
     player_position = (0, 0)
     collected_food = 0
     total_health = 100
     moves = 0
     
     # Display the initial grid
-    print_grid1(grid, player_position)
+    print_grid_g1(grid, player_position)
     
     # Game loop
     while collected_food < food_to_collect and moves < max_moves and total_health > 0:
@@ -169,9 +190,9 @@ def game_collect_food(size, food_to_collect, max_moves):
             return collected_food
         
         # Check if the move is valid
-        if is_valid_move1(player_position, decision, size, grid):
+        if is_valid_move_g1(player_position, decision, size, grid):
             # Make the move
-            new_position = make_move1(player_position, decision)
+            new_position = make_move_g1(player_position, decision)
             
             # Check the content of the new position
             if grid[new_position[0]][new_position[1]] == 'F':
@@ -197,7 +218,7 @@ def game_collect_food(size, food_to_collect, max_moves):
             player_position = new_position
             
             # Display the updated grid
-            print_grid1(grid, player_position)
+            print_grid_g1(grid, player_position)
             # print(f"Current Health: {total_health}%")
             print(f"Number of foods collected: {collected_food}")
 
@@ -227,6 +248,14 @@ def door_2():
 
     # Game 3: Decoding the Message for a Secret Mobile
     print_slow("A mysterious decoding game appears, promising a secret mobile if solved.")
+    print("Instructions:  ")
+    print("1. Encounter a decoding game for a secret mobile.")
+    print("2. Given encoded text and a key.")
+    print("3. Decode text using provided key.")
+    print("4. Enter decoding guess.")
+    print("5. Correct decode: Gain health.")
+    print("6. If health is sufficient, proceed to the next part.")
+    print()
     time.sleep(1)
     # Implement the game logic here...
     final_health,fl = game_2(player_health=100)
@@ -245,6 +274,15 @@ def door_2():
 
         # Game 4: AP/GP Series Number Finding Game
         print_slow("You and your ally embark on an adventure, navigating through an AP/GP series challenge.")
+        print("Instructions:  ")
+        print("1. Face an AP/GP series challenge with your ally.")
+        print("2. Given a sequence with a pattern.")
+        print("3. Analyze and predict the next number.")
+        print("4. Enter guess for the next number.")
+        print("5. Correct guess: Gain points.")
+        print("6. Repeat for a total of 8 rounds.")
+        print("7. More correct guesses, higher the score.")
+        print()
         time.sleep(1)
         player_score=0
         for _ in range(8):
@@ -535,6 +573,13 @@ def door_3():
 
     # Game 5: Description Game and Path Finding
     print_slow("A thrilling path lies ahead as you and your chosen superhero navigate a description game and a path-finding challenge.")
+    print("Instructions: ")
+    print("1. choose a superhero companion.")
+    print("2. Navigate a description game and path-finding challenge.")
+    print("3. Follow prompts to select a superhero and make moves.")
+    print("4. Work together with your superhero to escape the den.")
+    print("5. Winning leads to a triumphant escape.")
+    print()
     time.sleep(1)
     print("Select a superhero:")
     superheroes = ["Superman", "Batman", "Spider-Man"]
@@ -548,6 +593,15 @@ def door_3():
             print("Invalid choice. Please enter a valid number.")
     except ValueError:
         print("Invalid input. Please enter a number.")
+    print("Instructions: ")
+    print("1. Face a fixed grid with a path from top-left to bottom-right.")
+    print("2. Enter moves ('up', 'down', 'left', 'right') to navigate.")
+    print("3. Grid has walls ('1') and paths ('0').")
+    print("4. Goal: Reach the destination in bottom-right.")
+    print("5. Limit of 3 mistakes (invalid moves) before game ends.")
+    print()
+
+    
     a=game_5()
     if a:
         print_slow(f"You won the game with the help of your favourite superhero {superheroes[choice - 1]}")
