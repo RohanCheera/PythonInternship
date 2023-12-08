@@ -6,3 +6,5 @@ Task-1: To Do List Using Python.
 Task-2: Text Based Adventure Game.
 
 Task-3: Random Password Generator.
+
+Task-4: Currency Converter.
