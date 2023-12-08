@@ -1,0 +1,79 @@
+import requests
+
+def get_exchange_rate(base_currency, target_currency):
+    api_url = f"https://api.exchangerate-api.com/v4/latest/{base_currency}"
+    
+    try:
+        response = requests.get(api_url)
+        data = response.json()
+        rate = data['rates'][target_currency]
+        return rate
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching exchange rates: {e}")
+        return None
+
+def display_currency_options():
+    # Add more currencies as needed
+    currencies = {
+    "USD": "United States Dollar",
+    "EUR": "Euro",
+    "JPY": "Japanese Yen",
+    "GBP": "British Pound Sterling",
+    "AUD": "Australian Dollar",
+    "CAD": "Canadian Dollar",
+    "CHF": "Swiss Franc",
+    "CNY": "Chinese Yuan",
+    "SEK": "Swedish Krona",
+    "NZD": "New Zealand Dollar",
+    "MXN": "Mexican Peso",
+    "SGD": "Singapore Dollar",
+    "HKD": "Hong Kong Dollar",
+    "NOK": "Norwegian Krone",
+    "KRW": "South Korean Won",
+    "TRY": "Turkish Lira",
+    "RUB": "Russian Ruble",
+    "INR": "Indian Rupee",
+    "BRL": "Brazilian Real",
+    "ZAR": "South African Rand",
+    "AED": "United Arab Emirates Dirham",
+    "SAR": "Saudi Riyal",
+    "QAR": "Qatari Riyal",
+    "THB": "Thai Baht",
+    "IDR": "Indonesian Rupiah",
+    "MYR": "Malaysian Ringgit",
+    "PHP": "Philippine Peso",
+    "PLN": "Polish Złoty",
+    "EGP": "Egyptian Pound",
+    "CZK": "Czech Koruna",
+    }
+
+
+    print("Available currencies:")
+    for code, name in currencies.items():
+        print(f"{code}: {name}")
+
+    return currencies
+
+def convert_currency():
+    currencies = display_currency_options()
+
+    source_currency = input("Enter the source currency code: ").upper()
+    target_currency = input("Enter the target currency code: ").upper()
+
+    if source_currency not in currencies or target_currency not in currencies:
+        print("Invalid currency codes. Please enter valid currency codes.")
+        return
+
+    amount_str = input("Enter the amount to convert: ")
+    try:
+        amount = float(amount_str)
+    except ValueError:
+        print("Invalid amount. Please enter a numeric value.")
+        return
+
+    exchange_rate = get_exchange_rate(source_currency, target_currency)
+    if exchange_rate is not None:
+        converted_amount = amount * exchange_rate
+        print(f"{amount:.4f} {source_currency} is equal to {converted_amount:.4f} {target_currency} (Exchange rate: {exchange_rate:.4f})")
+
+convert_currency()
